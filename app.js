@@ -193,21 +193,24 @@ function goToStep(stepNumber) {
     const tabIcon = tab.querySelector('.tab-badge');
     if (s === stepNumber) {
       tab.setAttribute('aria-current', 'step');
-      tab.classList.remove('text-gray-500', 'border-transparent');
-      tab.classList.add('text-blue-600', 'border-blue-600', 'font-semibold');
-      if (tabIcon) tabIcon.classList.add('bg-blue-600', 'text-white');
+      tab.classList.remove('text-gray-500', 'text-emerald-600', 'border-transparent', 'border-emerald-500', 'bg-emerald-50/50');
+      tab.classList.add('text-blue-600', 'border-blue-600', 'bg-blue-50/50', 'font-semibold');
+      if (tabIcon) {
+        tabIcon.classList.remove('bg-gray-100', 'bg-emerald-600', 'text-gray-500');
+        tabIcon.classList.add('bg-blue-600', 'text-white');
+      }
     } else if (s < stepNumber) {
       tab.removeAttribute('aria-current');
-      tab.classList.remove('border-blue-600', 'text-gray-500');
-      tab.classList.add('text-emerald-600', 'border-emerald-500');
+      tab.classList.remove('text-blue-600', 'text-gray-500', 'border-blue-600', 'border-emerald-500', 'bg-blue-50/50', 'font-semibold');
+      tab.classList.add('text-emerald-700', 'border-transparent', 'bg-emerald-50/40');
       if (tabIcon) {
-        tabIcon.classList.remove('bg-blue-600');
+        tabIcon.classList.remove('bg-blue-600', 'bg-gray-100', 'text-gray-500');
         tabIcon.classList.add('bg-emerald-600', 'text-white');
       }
     } else {
       tab.removeAttribute('aria-current');
-      tab.classList.remove('text-blue-600', 'border-blue-600', 'text-emerald-600', 'border-emerald-500', 'font-semibold');
-      tab.classList.add('text-gray-500', 'border-transparent');
+      tab.classList.remove('text-blue-600', 'text-emerald-600', 'text-emerald-700', 'border-blue-600', 'border-emerald-500', 'bg-blue-50/50', 'bg-emerald-50/40', 'font-semibold');
+      tab.classList.add('text-gray-500', 'border-transparent', 'bg-transparent');
       if (tabIcon) {
         tabIcon.classList.remove('bg-blue-600', 'bg-emerald-600', 'text-white');
         tabIcon.classList.add('bg-gray-100', 'text-gray-500');
