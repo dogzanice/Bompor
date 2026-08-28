@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bompor (บ่มเพาะ) | ระบบบันทึกการศึกษาดูงาน วิทยาลัยอาชีวศึกษานครศรีธรรมราช</title>
   
   <!-- Google Fonts: Prompt & Sarabun -->
@@ -37,9 +37,41 @@
   </script>
 
   <style>
+    :root {
+      --ink: #183b3a;
+      --paper: #f6f8f7;
+      --line: #dce7e4;
+    }
+
     body {
       font-family: 'Prompt', sans-serif;
       -webkit-tap-highlight-color: transparent;
+      background:
+        radial-gradient(circle at 12% 4%, rgba(16, 185, 129, .08), transparent 28rem),
+        radial-gradient(circle at 90% 22%, rgba(245, 158, 11, .06), transparent 24rem),
+        var(--paper);
+    }
+    button, input, select, textarea {
+      font: inherit;
+    }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(59, 130, 246, .3);
+      outline-offset: 2px;
+    }
+    .paper-texture {
+      background-image: linear-gradient(rgba(255,255,255,.3) 1px, transparent 1px);
+      background-size: 100% 22px;
+    }
+    .photo-action-overlay {
+      touch-action: manipulation;
+    }
+    @media (hover: none) {
+      .photo-action-overlay {
+        opacity: 1 !important;
+        background: linear-gradient(transparent 45%, rgba(15,23,42,.72));
+        align-items: flex-end;
+        padding-bottom: .75rem;
+      }
     }
     .thai-doc {
       font-family: 'Sarabun', 'TH SarabunPSK', sans-serif;
@@ -97,7 +129,7 @@
     </div>
 
     <!-- Progress Indicator Bar -->
-    <div class="w-full bg-black/20 h-1.5">
+    <div class="relative w-full bg-black/20 h-1.5" role="progressbar" aria-label="ความคืบหน้าการกรอกข้อมูล" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div id="progressBar" class="bg-gradient-to-r from-emerald-400 to-teal-300 h-full transition-all duration-300" style="width: 20%;"></div>
     </div>
   </header>
@@ -105,19 +137,19 @@
   <!-- Step Wizard Tabs -->
   <div class="max-w-4xl mx-auto px-4 mt-4">
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-1.5 grid grid-cols-4 gap-1 text-xs sm:text-sm font-medium">
-      <button data-step-target="1" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-blue-600 border border-blue-600 bg-blue-50/50 font-semibold transition">
+      <button data-step-target="1" aria-current="step" aria-controls="step_section_1" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-blue-600 border border-blue-600 bg-blue-50/50 font-semibold transition">
         <span class="tab-badge w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">1</span>
         <span class="truncate">ข้อมูลส่วนตัว</span>
       </button>
-      <button data-step-target="2" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-gray-500 hover:bg-slate-50 transition">
+      <button data-step-target="2" aria-controls="step_section_2" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-gray-500 hover:bg-slate-50 transition">
         <span class="tab-badge w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs">2</span>
         <span class="truncate">โกโก้ตาหลวง</span>
       </button>
-      <button data-step-target="3" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-gray-500 hover:bg-slate-50 transition">
+      <button data-step-target="3" aria-controls="step_section_3" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-gray-500 hover:bg-slate-50 transition">
         <span class="tab-badge w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs">3</span>
         <span class="truncate">รักษ์จันทน์110</span>
       </button>
-      <button data-step-target="4" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-gray-500 hover:bg-slate-50 transition">
+      <button data-step-target="4" aria-controls="step_section_4" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-gray-500 hover:bg-slate-50 transition">
         <span class="tab-badge w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs">4</span>
         <span class="truncate">โหลด Word</span>
       </button>
@@ -142,7 +174,7 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
           <div class="sm:col-span-3">
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">คำนำหน้า</label>
+            <label for="input_prefix" class="block text-xs font-semibold text-slate-600 mb-1.5">คำนำหน้า</label>
             <select name="prefix" id="input_prefix" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
               <option value="นาย">นาย</option>
               <option value="นางสาว">นางสาว</option>
@@ -151,13 +183,13 @@
           </div>
 
           <div class="sm:col-span-4">
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">ชื่อ <span class="text-rose-500">*</span></label>
-            <input type="text" name="firstName" id="input_firstName" placeholder="เช่น สมชาย" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
+            <label for="input_firstName" class="block text-xs font-semibold text-slate-600 mb-1.5">ชื่อ <span class="text-rose-500">*</span></label>
+            <input type="text" name="firstName" id="input_firstName" autocomplete="given-name" required placeholder="เช่น สมชาย" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
           </div>
 
           <div class="sm:col-span-5">
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">นามสกุล <span class="text-rose-500">*</span></label>
-            <input type="text" name="lastName" id="input_lastName" placeholder="เช่น ใจดี" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
+            <label for="input_lastName" class="block text-xs font-semibold text-slate-600 mb-1.5">นามสกุล <span class="text-rose-500">*</span></label>
+            <input type="text" name="lastName" id="input_lastName" autocomplete="family-name" required placeholder="เช่น ใจดี" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm transition">
           </div>
 
           <div class="sm:col-span-5">
@@ -271,13 +303,13 @@
             <!-- Photo 1 -->
             <div id="dropzone_photo1" class="relative group border-2 border-dashed border-slate-200 hover:border-amber-400 rounded-2xl p-4 bg-slate-50/60 hover:bg-amber-50/30 transition text-center cursor-pointer min-h-[170px] flex flex-col items-center justify-center overflow-hidden" onclick="document.getElementById('input_photo1').click()">
               <input type="file" id="input_photo1" accept="image/*" class="hidden">
-              <img id="img_preview_photo1" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
+              <img id="img_preview_photo1" alt="รูปกิจกรรมโกโก้ตาหลวง รูปที่ 1" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
               <div id="placeholder_photo1" class="flex flex-col items-center pointer-events-none">
                 <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-amber-600 mb-2">📷</div>
                 <p class="text-xs font-semibold text-slate-700">รูปกิจกรรมที่ 1 (โกโก้ตาหลวง)</p>
                 <p class="text-[10px] text-slate-400 mt-0.5">แตะเพื่อถ่ายรูป หรือเลือกจากคลัง</p>
               </div>
-              <div id="overlay_photo1" class="hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div id="overlay_photo1" class="photo-action-overlay hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button type="button" class="px-3 py-1.5 bg-white/90 text-slate-800 rounded-lg text-xs font-medium shadow hover:bg-white">เปลี่ยนรูป</button>
                 <button type="button" id="remove_photo1" class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-medium shadow hover:bg-rose-700">ลบ</button>
               </div>
@@ -286,13 +318,13 @@
             <!-- Photo 2 -->
             <div id="dropzone_photo2" class="relative group border-2 border-dashed border-slate-200 hover:border-amber-400 rounded-2xl p-4 bg-slate-50/60 hover:bg-amber-50/30 transition text-center cursor-pointer min-h-[170px] flex flex-col items-center justify-center overflow-hidden" onclick="document.getElementById('input_photo2').click()">
               <input type="file" id="input_photo2" accept="image/*" class="hidden">
-              <img id="img_preview_photo2" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
+              <img id="img_preview_photo2" alt="รูปกิจกรรมโกโก้ตาหลวง รูปที่ 2" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
               <div id="placeholder_photo2" class="flex flex-col items-center pointer-events-none">
                 <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-amber-600 mb-2">📷</div>
                 <p class="text-xs font-semibold text-slate-700">รูปกิจกรรมที่ 2 (โกโก้ตาหลวง)</p>
                 <p class="text-[10px] text-slate-400 mt-0.5">แตะเพื่อถ่ายรูป หรือเลือกจากคลัง</p>
               </div>
-              <div id="overlay_photo2" class="hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div id="overlay_photo2" class="photo-action-overlay hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button type="button" class="px-3 py-1.5 bg-white/90 text-slate-800 rounded-lg text-xs font-medium shadow hover:bg-white">เปลี่ยนรูป</button>
                 <button type="button" id="remove_photo2" class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-medium shadow hover:bg-rose-700">ลบ</button>
               </div>
@@ -380,13 +412,13 @@
             <!-- Photo 3 -->
             <div id="dropzone_photo3" class="relative group border-2 border-dashed border-slate-200 hover:border-emerald-400 rounded-2xl p-4 bg-slate-50/60 hover:bg-emerald-50/30 transition text-center cursor-pointer min-h-[170px] flex flex-col items-center justify-center overflow-hidden" onclick="document.getElementById('input_photo3').click()">
               <input type="file" id="input_photo3" accept="image/*" class="hidden">
-              <img id="img_preview_photo3" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
+              <img id="img_preview_photo3" alt="รูปกิจกรรมรักษ์จันทน์110 รูปที่ 1" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
               <div id="placeholder_photo3" class="flex flex-col items-center pointer-events-none">
                 <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-emerald-600 mb-2">📷</div>
                 <p class="text-xs font-semibold text-slate-700">รูปกิจกรรมที่ 1 (รักษ์จันทน์110)</p>
                 <p class="text-[10px] text-slate-400 mt-0.5">แตะเพื่อถ่ายรูป หรือเลือกจากคลัง</p>
               </div>
-              <div id="overlay_photo3" class="hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div id="overlay_photo3" class="photo-action-overlay hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button type="button" class="px-3 py-1.5 bg-white/90 text-slate-800 rounded-lg text-xs font-medium shadow hover:bg-white">เปลี่ยนรูป</button>
                 <button type="button" id="remove_photo3" class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-medium shadow hover:bg-rose-700">ลบ</button>
               </div>
@@ -395,13 +427,13 @@
             <!-- Photo 4 -->
             <div id="dropzone_photo4" class="relative group border-2 border-dashed border-slate-200 hover:border-emerald-400 rounded-2xl p-4 bg-slate-50/60 hover:bg-emerald-50/30 transition text-center cursor-pointer min-h-[170px] flex flex-col items-center justify-center overflow-hidden" onclick="document.getElementById('input_photo4').click()">
               <input type="file" id="input_photo4" accept="image/*" class="hidden">
-              <img id="img_preview_photo4" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
+              <img id="img_preview_photo4" alt="รูปกิจกรรมรักษ์จันทน์110 รูปที่ 2" class="hidden absolute inset-0 w-full h-full object-cover rounded-2xl">
               <div id="placeholder_photo4" class="flex flex-col items-center pointer-events-none">
                 <div class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-emerald-600 mb-2">📷</div>
                 <p class="text-xs font-semibold text-slate-700">รูปกิจกรรมที่ 2 (รักษ์จันทน์110)</p>
                 <p class="text-[10px] text-slate-400 mt-0.5">แตะเพื่อถ่ายรูป หรือเลือกจากคลัง</p>
               </div>
-              <div id="overlay_photo4" class="hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div id="overlay_photo4" class="photo-action-overlay hidden absolute inset-0 bg-black/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <button type="button" class="px-3 py-1.5 bg-white/90 text-slate-800 rounded-lg text-xs font-medium shadow hover:bg-white">เปลี่ยนรูป</button>
                 <button type="button" id="remove_photo4" class="px-3 py-1.5 bg-rose-600 text-white rounded-lg text-xs font-medium shadow hover:bg-rose-700">ลบ</button>
               </div>
@@ -432,9 +464,9 @@
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-white/20 backdrop-blur text-white mb-3">
             ✨ ข้อมูลพร้อมส่งออกเอกสาร
           </span>
-          <h2 class="text-xl sm:text-2xl font-bold leading-tight">บันทึกข้อมูลเรียบร้อยแล้ว!</h2>
+          <h2 class="text-xl sm:text-2xl font-bold leading-tight">ตรวจสอบรายงานก่อนดาวน์โหลด</h2>
           <p class="text-emerald-100 text-xs sm:text-sm mt-1 mb-6">
-            กดปุ่มดาวน์โหลดไฟล์ Word (.docx) ด้านล่างเพื่อนำเอกสารสมบูรณ์พร้อมรูปภาพไปส่งอาจารย์ได้ทันที
+            ตรวจสอบความครบถ้วนด้านล่าง แล้วกดดาวน์โหลดไฟล์ Word (.docx) เพื่อนำเอกสารพร้อมรูปภาพไปส่งอาจารย์
           </p>
 
           <div class="flex flex-wrap gap-3">
@@ -451,6 +483,21 @@
               คัดลอกสรุปข้อความ
             </button>
           </div>
+
+          <div id="completionChecklist" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-emerald-50" aria-live="polite">
+            <div class="rounded-xl bg-black/15 border border-white/10 px-3 py-2 flex items-center gap-2">
+              <span id="check_person_icon" class="text-base">○</span>
+              <span><strong class="block text-white">ข้อมูลส่วนตัว</strong><small id="check_person_text">ยังไม่ครบ</small></span>
+            </div>
+            <div class="rounded-xl bg-black/15 border border-white/10 px-3 py-2 flex items-center gap-2">
+              <span id="check_place1_icon" class="text-base">○</span>
+              <span><strong class="block text-white">โกโก้ตาหลวง</strong><small id="check_place1_text">0/6 รายการ</small></span>
+            </div>
+            <div class="rounded-xl bg-black/15 border border-white/10 px-3 py-2 flex items-center gap-2">
+              <span id="check_place2_icon" class="text-base">○</span>
+              <span><strong class="block text-white">รักษ์จันทน์110</strong><small id="check_place2_text">0/6 รายการ</small></span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -463,7 +510,7 @@
           <span class="text-xs text-slate-400">จัดหน้าตามแบบฟอร์มทางการ</span>
         </div>
 
-        <div id="printArea" class="thai-doc bg-slate-50/80 p-4 sm:p-8 rounded-2xl border border-slate-200 text-slate-800 text-sm space-y-6">
+        <div id="printArea" class="paper-texture thai-doc bg-slate-50/80 p-4 sm:p-8 rounded-2xl border border-slate-200 text-slate-800 text-sm space-y-6">
           
           <!-- Page 1: ปก -->
           <div class="bg-white p-6 sm:p-10 rounded-xl shadow-sm border border-slate-200/60 text-center space-y-3">

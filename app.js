@@ -59,6 +59,7 @@ const DRAFT_KEY = 'FIELD_TRIP_REPORT_DRAFT_2026';
 document.addEventListener('DOMContentLoaded', () => {
   loadDraft();
   setupEventListeners();
+  goToStep(state.currentStep);
   updateProgressUI();
   updateLivePreview();
 });
@@ -191,10 +192,12 @@ function goToStep(stepNumber) {
     const s = index + 1;
     const tabIcon = tab.querySelector('.tab-badge');
     if (s === stepNumber) {
+      tab.setAttribute('aria-current', 'step');
       tab.classList.remove('text-gray-500', 'border-transparent');
       tab.classList.add('text-blue-600', 'border-blue-600', 'font-semibold');
       if (tabIcon) tabIcon.classList.add('bg-blue-600', 'text-white');
     } else if (s < stepNumber) {
+      tab.removeAttribute('aria-current');
       tab.classList.remove('border-blue-600', 'text-gray-500');
       tab.classList.add('text-emerald-600', 'border-emerald-500');
       if (tabIcon) {
@@ -202,6 +205,7 @@ function goToStep(stepNumber) {
         tabIcon.classList.add('bg-emerald-600', 'text-white');
       }
     } else {
+      tab.removeAttribute('aria-current');
       tab.classList.remove('text-blue-600', 'border-blue-600', 'text-emerald-600', 'border-emerald-500', 'font-semibold');
       tab.classList.add('text-gray-500', 'border-transparent');
       if (tabIcon) {
@@ -420,6 +424,38 @@ function updateProgressUI() {
 
   if (progressBar) progressBar.style.width = `${percent}%`;
   if (progressText) progressText.innerText = `${percent}% (${filledCount}/${totalFields} หัวข้อ)`;
+
+  const progressTrack = progressBar?.parentElement;
+  if (progressTrack) progressTrack.setAttribute('aria-valuenow', String(percent));
+
+  updateCompletionChecklist();
+}
+
+function updateCompletionChecklist() {
+  const setStatus = (iconId, textId, complete, text) => {
+    const icon = document.getElementById(iconId);
+    const label = document.getElementById(textId);
+    if (icon) {
+      icon.textContent = complete ? '✓' : '○';
+      icon.classList.toggle('text-lime-300', complete);
+    }
+    if (label) label.textContent = text;
+  };
+
+  const personalComplete = Boolean(state.firstName.trim() && state.lastName.trim());
+  const place1Fields = ['place1_knowledge', 'place1_apply', 'place1_impression', 'place1_suggestion']
+    .filter(key => state[key].trim()).length;
+  const place2Fields = ['place2_knowledge', 'place2_apply', 'place2_impression', 'place2_suggestion']
+    .filter(key => state[key].trim()).length;
+  const place1Photos = ['photo1', 'photo2'].filter(key => state.photos[key]).length;
+  const place2Photos = ['photo3', 'photo4'].filter(key => state.photos[key]).length;
+
+  setStatus('check_person_icon', 'check_person_text', personalComplete,
+    personalComplete ? 'พร้อมใช้งาน' : 'กรุณากรอกชื่อและนามสกุล');
+  setStatus('check_place1_icon', 'check_place1_text', place1Fields === 4 && place1Photos === 2,
+    `${place1Fields}/4 หัวข้อ • ${place1Photos}/2 รูป`);
+  setStatus('check_place2_icon', 'check_place2_text', place2Fields === 4 && place2Photos === 2,
+    `${place2Fields}/4 หัวข้อ • ${place2Photos}/2 รูป`);
 }
 
 // Live Preview Mode
