@@ -91,12 +91,14 @@ function setupEventListeners() {
   // Form Inputs
   const formElements = document.querySelectorAll('input[name], select[name], textarea[name]');
   formElements.forEach(el => {
-    el.addEventListener('input', () => {
+    const updateHandler = () => {
       state[el.name] = el.value;
       saveDraft();
       updateProgressUI();
       updateLivePreview();
-    });
+    };
+    el.addEventListener('input', updateHandler);
+    el.addEventListener('change', updateHandler);
   });
 
   // Image Upload Inputs
