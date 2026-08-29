@@ -141,6 +141,15 @@ function setupEventListeners() {
     }
   });
 
+  // Google Drive Submit Button
+  const btnSubmitGoogleDrive = document.getElementById('btnSubmitGoogleDrive');
+  if (btnSubmitGoogleDrive) {
+    btnSubmitGoogleDrive.addEventListener('click', handleSubmitGoogleDrive);
+  }
+
+  // Setup Settings Modal
+  setupSettingsModal();
+
   // Download Word Button
   const btnDownloadWord = document.getElementById('btnDownloadWord');
   if (btnDownloadWord) {
@@ -622,4 +631,150 @@ function showToast(message, type = 'info') {
     toast.classList.add('opacity-0', 'translate-y-2');
     setTimeout(() => toast.remove(), 300);
   }, 3500);
+}
+
+
+// Google Apps Script Configuration
+const GAS_URL_KEY = 'BOMPOR_GAS_ENDPOINT_URL';
+let gasUrl = localStorage.getItem(GAS_URL_KEY) || '';
+
+// Settings Modal
+function setupSettingsModal() {
+  const modal = document.getElementById('settingsModal');
+  const btnOpen = document.getElementById('btnOpenSettings');
+  const btnClose = document.getElementById('btnCloseSettings');
+  const btnSave = document.getElementById('btnSaveSettings');
+  const inputUrl = document.getElementById('input_gasUrl');
+
+  if (inputUrl) inputUrl.value = gasUrl;
+
+  if (btnOpen && modal) {
+    btnOpen.addEventListener('click', () => {
+      if (inputUrl) inputUrl.value = gasUrl;
+      modal.classList.remove('hidden');
+    });
+  }
+
+  if (btnClose && modal) {
+    btnClose.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+  }
+
+  if (btnSave && modal) {
+    btnSave.addEventListener('click', () => {
+      gasUrl = (inputUrl ? inputUrl.value.trim() : '');
+      localStorage.setItem(GAS_URL_KEY, gasUrl);
+      modal.classList.add('hidden');
+      showToast('บันทึก Web App URL สำหรับ Google Drive แล้ว', 'success');
+    });
+  }
+}
+
+// Convert Blob to Base64
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+// Handle Google Drive Submission
+async function handleSubmitGoogleDrive() {
+  const btn = document.getElementById('btnSubmitGoogleDrive');
+  const originalText = btn.innerHTML;
+
+  if (!state.firstName.trim() || !state.lastName.trim()) {
+    showToast('กรุณากรอกชื่อ-นามสกุลก่อนส่งงาน', 'warning');
+    goToStep(1);
+    return;
+  }
+
+  if (!gasUrl) {
+    showToast('ยังไม่ได้ตั้งค่า Google Apps Script Web App URL', 'warning');
+    document.getElementById('settingsModal')?.classList.remove('hidden');
+    return;
+  }
+
+  try {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-emerald-950 inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      กำลังส่งงานเข้า Google Drive...
+    `;
+
+    const fullName = `${state.prefix || ''}${state.firstName || ''} ${state.lastName || ''}`.trim();
+    const filename = `แบบบันทึกดูงาน_${fullName.replace(/\s+/g, '_')}_${state.level.replace(/[\/\s]+/g, '_')}.docx`;
+
+    // 1. Generate Docx Blob
+    const blob = await window.DocxGenerator.generateDocxBlob(window.DOCX_TEMPLATE_BASE64, {
+      prefix: state.prefix,
+      firstName: state.firstName,
+      lastName: state.lastName,
+      fullName: fullName,
+      level: state.level,
+      department: state.department,
+      place1_knowledge: state.place1_knowledge,
+      place1_apply: state.place1_apply,
+      place1_impression: state.place1_impression,
+      place1_suggestion: state.place1_suggestion,
+      place2_knowledge: state.place2_knowledge,
+      place2_apply: state.place2_apply,
+      place2_impression: state.place2_impression,
+      place2_suggestion: state.place2_suggestion,
+      photos: state.photos
+    });
+
+    // 2. Convert to Base64
+    const fileBase64 = await blobToBase64(blob);
+
+    // 3. Payload
+    const payload = {
+      fileName: filename,
+      fileBase64: fileBase64,
+      department: state.department,
+      studentName: fullName,
+      level: state.level
+    };
+
+    // 4. Send via POST using text/plain (avoids CORS preflight in Google Apps Script)
+    await fetch(gasUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    });
+
+    // 5. Update UI Status
+    const statusBox = document.getElementById('driveSubmissionStatus');
+    const msgTitle = document.getElementById('statusMsgTitle');
+    const msgDetail = document.getElementById('statusMsgDetail');
+    const timestamp = document.getElementById('statusTimestamp');
+
+    if (statusBox) {
+      statusBox.classList.remove('hidden');
+      if (msgTitle) msgTitle.textContent = `ส่งงานเข้าโฟลเดอร์ "${state.department}" สำเร็จแล้ว!`;
+      if (msgDetail) msgDetail.textContent = `ไฟล์: ${filename}`;
+      if (timestamp) timestamp.textContent = new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + ' น.';
+    }
+
+    showToast(`ส่งไฟล์ Word ไปยัง Google Drive แผนก "${state.department}" สำเร็จแล้ว! 🎉`, 'success');
+
+  } catch (err) {
+    console.error(err);
+    showToast('เกิดข้อผิดพลาดในการส่งงาน: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalText;
+  }
 }

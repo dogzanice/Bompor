@@ -125,6 +125,9 @@
           <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
           บันทึกร่างแล้ว
         </span>
+        <button id="btnOpenSettings" title="ตั้งค่า Google Drive ครู" class="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg text-xs transition flex items-center gap-1">
+          ⚙️ <span class="hidden sm:inline">ตั้งค่า Drive</span>
+        </button>
         <button id="btnClearDraft" title="ล้างข้อมูลร่าง" class="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg text-xs transition">
           🔄 ล้างร่าง
         </button>
@@ -647,5 +650,33 @@
   <script src="template-base64.js"></script>
   <script src="docx-generator.js"></script>
   <script src="app.js"></script>
+  <!-- Settings Modal (Google Drive Endpoint) -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">⚙️</span>
+          <h3 class="font-bold text-slate-800 text-base">ตั้งค่าระบบเชื่อมต่อ Google Drive ครู</h3>
+        </div>
+        <button id="btnCloseSettings" class="text-slate-400 hover:text-slate-600 p-1">✕</button>
+      </div>
+      <div class="text-xs text-slate-600 space-y-2">
+        <p class="font-medium text-slate-700">โฟลเดอร์ Google Drive ปลายทาง:</p>
+        <p class="bg-slate-50 p-2.5 rounded-xl text-slate-500 break-all font-mono text-[11px] border border-slate-200">
+          https://drive.google.com/drive/folders/1NxIYXdZLv8rLU2I-ZYByldW-AAEznFU9
+        </p>
+        <label class="block font-semibold text-slate-700 pt-2">Google Apps Script Web App URL (สำหรับรับไฟล์):</label>
+        <input type="text" id="input_gasUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs focus:bg-white focus:ring-2 focus:ring-emerald-500 outline-none font-mono">
+        <p class="text-[11px] text-slate-400 leading-relaxed">
+          * หากนำโค้ด Apps Script ไป Deploy แล้ว ให้นำ Web App URL มาใส่ที่นี่ ระบบจะบันทึกไว้ให้และให้นักเรียนทุกคนส่งงานเข้าโฟลเดอร์ได้ทันที
+        </p>
+      </div>
+      <div class="flex justify-end gap-2 pt-2 border-t border-slate-100">
+        <button type="button" id="btnSaveSettings" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-md">
+          บันทึกการตั้งค่า
+        </button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
