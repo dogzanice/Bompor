@@ -157,7 +157,7 @@
       </button>
       <button data-step-target="4" aria-controls="step_section_4" class="step-tab flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 py-2 px-2 rounded-xl text-gray-500 hover:bg-slate-50 transition">
         <span class="tab-badge w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-xs">4</span>
-        <span class="truncate">โหลด Word</span>
+        <span class="truncate">ส่งงาน / โหลด Word</span>
       </button>
     </div>
   </div>
@@ -465,39 +465,69 @@
     <section id="step_section_4" class="step-content hidden space-y-6">
       
       <!-- Action Banner -->
-      <div class="bg-gradient-to-br from-emerald-700 via-teal-800 to-slate-900 rounded-3xl shadow-xl p-5 sm:p-7 text-white relative overflow-hidden">
-        <div class="relative z-10 max-w-xl">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-white/20 backdrop-blur text-white mb-3">
-            ✨ พร้อมดาวน์โหลด
-          </span>
-          <h2 class="text-xl sm:text-2xl font-bold leading-tight">ตรวจสอบรายงานก่อนดาวน์โหลด</h2>
-          <p class="text-emerald-100 text-xs sm:text-sm mt-1 mb-5">
-            ตรวจสอบความครบถ้วนด้านล่าง แล้วกดดาวน์โหลดไฟล์ Word (.docx) เพื่อนำเอกสารพร้อมรูปภาพไปส่งอาจารย์
+      <div class="bg-gradient-to-br from-emerald-800 via-teal-900 to-slate-950 rounded-3xl shadow-2xl p-6 sm:p-8 text-white relative overflow-hidden border border-emerald-500/30">
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30">
+              ✨ เอกสารพร้อมส่งครู
+            </span>
+          </div>
+
+          <h2 class="text-2xl sm:text-3xl font-extrabold leading-tight text-white">
+            ส่งรายงานเข้า Google Drive ครู
+          </h2>
+          <p class="text-emerald-100/90 text-xs sm:text-sm mt-1.5 mb-6 max-w-xl leading-relaxed">
+            กดปุ่มสีเขียวด้านล่าง ระบบจะสร้างไฟล์ Word (.docx) พร้อมรูปภาพ และส่งตรงเข้าโฟลเดอร์แผนกวิชาใน Google Drive ของคุณครูทันที
           </p>
 
-          <div class="grid grid-cols-2 sm:grid-cols-2 gap-3 items-stretch max-w-2xl">
-            <button type="button" id="btnDownloadWord" class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-2.5 px-4 py-3.5 rounded-2xl bg-white text-slate-900 font-bold text-sm sm:text-base shadow-lg hover:bg-emerald-50 transition transform active:scale-95">
-              <span>📄</span>
-              ดาวน์โหลดไฟล์ Word (.docx)
+          <!-- Main CTA Buttons -->
+          <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5">
+            <button type="button" id="btnSubmitGoogleDrive" class="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-300 hover:from-emerald-300 hover:to-teal-200 text-emerald-950 font-extrabold text-base sm:text-lg shadow-xl shadow-emerald-950/50 transition transform active:scale-95 cursor-pointer border border-white/40">
+              <span class="text-2xl">📤</span>
+              <span>ส่งงานเข้า Google Drive ครู</span>
             </button>
-            <button type="button" id="btnPrintPdf" class="col-span-2 sm:col-span-1 inline-flex items-center justify-center gap-2 px-3 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur text-white border border-white/20 font-semibold text-sm transition">
+
+            <button type="button" id="btnDownloadWord" class="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-white/90 hover:bg-white text-slate-900 font-bold text-sm shadow transition transform active:scale-95">
+              <span>📄</span>
+              โหลดไฟล์ Word เก็บไว้
+            </button>
+
+            <button type="button" id="btnPrintPdf" class="inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur text-white border border-white/20 font-medium text-xs sm:text-sm transition">
               <span>🖨️</span>
-              พิมพ์ / บันทึก PDF
+              พิมพ์ / PDF
+            </button>
+
+            <button type="button" id="btnCopySummary" class="inline-flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl bg-white/10 hover:bg-white/20 backdrop-blur text-white border border-white/20 font-medium text-xs sm:text-sm transition">
+              <span>📋</span>
+              คัดลอกสรุป
             </button>
           </div>
 
-          <div id="completionChecklist" class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-emerald-50" aria-live="polite">
-            <div class="rounded-xl bg-black/15 border border-white/10 px-3 py-2 flex items-center gap-2 min-h-[52px]">
-              <span id="check_person_icon" class="text-base">○</span>
-              <span><strong class="block text-white">ข้อมูลส่วนตัว</strong><small id="check_person_text">ยังไม่ครบ</small></span>
+          <!-- Submission Status Box -->
+          <div id="driveSubmissionStatus" class="hidden mt-5 p-4 rounded-2xl bg-emerald-500/25 backdrop-blur-md border border-emerald-400/50 text-white flex items-center justify-between transition-all">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-full bg-emerald-400 text-emerald-950 flex items-center justify-center font-bold text-base shadow">✓</span>
+              <div>
+                <p class="font-bold text-sm text-emerald-200" id="statusMsgTitle">ส่งงานเข้า Google Drive ครูเรียบร้อยแล้ว!</p>
+                <p class="text-xs text-white/90 mt-0.5" id="statusMsgDetail">ไฟล์ถูกจัดเก็บลงในโฟลเดอร์แผนกวิชาเรียบร้อย</p>
+              </div>
             </div>
-            <div class="rounded-xl bg-black/15 border border-white/10 px-3 py-2 flex items-center gap-2 min-h-[52px]">
-              <span id="check_place1_icon" class="text-base">○</span>
-              <span><strong class="block text-white">โกโก้ตาหลวง</strong><small id="check_place1_text">0/6 รายการ</small></span>
+            <span class="text-xs text-emerald-200 font-mono bg-black/20 px-2.5 py-1 rounded-lg" id="statusTimestamp"></span>
+          </div>
+
+          <!-- Checklist -->
+          <div id="completionChecklist" class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-emerald-50" aria-live="polite">
+            <div class="rounded-xl bg-black/20 border border-white/10 px-3 py-2 flex items-center gap-2 min-h-[52px]">
+              <span id="check_person_icon" class="text-base text-emerald-400">✓</span>
+              <span><strong class="block text-white">ข้อมูลส่วนตัว</strong><small id="check_person_text" class="text-emerald-200/80">พร้อมส่ง</small></span>
             </div>
-            <div class="rounded-xl bg-black/15 border border-white/10 px-3 py-2 flex items-center gap-2 min-h-[52px]">
-              <span id="check_place2_icon" class="text-base">○</span>
-              <span><strong class="block text-white">รักษ์จันทน์110</strong><small id="check_place2_text">0/6 รายการ</small></span>
+            <div class="rounded-xl bg-black/20 border border-white/10 px-3 py-2 flex items-center gap-2 min-h-[52px]">
+              <span id="check_place1_icon" class="text-base text-emerald-400">✓</span>
+              <span><strong class="block text-white">โกโก้ตาหลวง</strong><small id="check_place1_text" class="text-emerald-200/80">จุดดูงานที่ 1</small></span>
+            </div>
+            <div class="rounded-xl bg-black/20 border border-white/10 px-3 py-2 flex items-center gap-2 min-h-[52px]">
+              <span id="check_place2_icon" class="text-base text-emerald-400">✓</span>
+              <span><strong class="block text-white">รักษ์จันทน์110</strong><small id="check_place2_text" class="text-emerald-200/80">จุดดูงานที่ 2</small></span>
             </div>
           </div>
         </div>
