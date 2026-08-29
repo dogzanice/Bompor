@@ -148,8 +148,7 @@ function setupEventListeners() {
   }
 
   // Setup Settings Modal
-  setupSettingsModal();
-
+  
   // Download Word Button
   const btnDownloadWord = document.getElementById('btnDownloadWord');
   if (btnDownloadWord) {
@@ -637,7 +636,7 @@ function showToast(message, type = 'info') {
 // Google Apps Script Configuration
 const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbydD6kM5CCEWskya_HTMorWF7OAjVxxeMiuuWoP9U98dyD0ZiyNBByWgodcO9oLBcsepA/exec';
 const GAS_URL_KEY = 'BOMPOR_GAS_ENDPOINT_URL';
-let gasUrl = localStorage.getItem(GAS_URL_KEY) || DEFAULT_GAS_URL;
+let GAS_ENDPOINT_URL = localStorage.getItem(GAS_URL_KEY) || DEFAULT_GAS_URL;
 
 
 // Settings Modal
@@ -646,13 +645,13 @@ function setupSettingsModal() {
   const btnOpen = document.getElementById('btnOpenSettings');
   const btnClose = document.getElementById('btnCloseSettings');
   const btnSave = document.getElementById('btnSaveSettings');
-  const inputUrl = document.getElementById('input_gasUrl');
+  const inputUrl = document.getElementById('input_GAS_ENDPOINT_URL');
 
-  if (inputUrl) inputUrl.value = gasUrl;
+  if (inputUrl) inputUrl.value = GAS_ENDPOINT_URL;
 
   if (btnOpen && modal) {
     btnOpen.addEventListener('click', () => {
-      if (inputUrl) inputUrl.value = gasUrl;
+      if (inputUrl) inputUrl.value = GAS_ENDPOINT_URL;
       modal.classList.remove('hidden');
     });
   }
@@ -665,8 +664,8 @@ function setupSettingsModal() {
 
   if (btnSave && modal) {
     btnSave.addEventListener('click', () => {
-      gasUrl = (inputUrl ? inputUrl.value.trim() : '');
-      localStorage.setItem(GAS_URL_KEY, gasUrl);
+      GAS_ENDPOINT_URL = (inputUrl ? inputUrl.value.trim() : '');
+      localStorage.setItem(GAS_URL_KEY, GAS_ENDPOINT_URL);
       modal.classList.add('hidden');
       showToast('บันทึก Web App URL สำหรับ Google Drive แล้ว', 'success');
     });
@@ -697,9 +696,9 @@ async function handleSubmitGoogleDrive() {
     return;
   }
 
-  if (!gasUrl) {
+  if (!GAS_ENDPOINT_URL) {
     showToast('ยังไม่ได้ตั้งค่า Google Apps Script Web App URL', 'warning');
-    document.getElementById('settingsModal')?.classList.remove('hidden');
+    
     return;
   }
 
@@ -748,7 +747,7 @@ async function handleSubmitGoogleDrive() {
     };
 
     // 4. Send via POST using text/plain (avoids CORS preflight in Google Apps Script)
-    await fetch(gasUrl, {
+    await fetch(GAS_ENDPOINT_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain;charset=utf-8'
